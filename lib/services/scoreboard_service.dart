@@ -99,7 +99,7 @@ class OverallScore {
 // --- SERVICE CLASS ---
 
 class ScoreboardService {
-  final String _baseUrl = 'http://127.0.0.1:5000'; // Your Flask backend URL
+  final String _baseUrl = ''; // Use a relative path for production
 
   // --- NEW METHOD for Detailed Scoreboard ---
   Future<DetailedScoreboard> fetchDetailedScoreboard() async {

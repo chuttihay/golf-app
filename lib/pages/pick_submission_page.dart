@@ -68,8 +68,8 @@ class _PickSubmissionPageState extends State<PickSubmissionPage> {
           children: [
             Image.asset(
               'lib/assets/images/logo.png',
-              height: 30,
-              width: 30,
+              height: 40,
+              width: 40,
             ),
             const SizedBox(width: 8),
             // Use Expanded and FittedBox to prevent title overflow

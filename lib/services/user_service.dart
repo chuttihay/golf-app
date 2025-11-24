@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserService {
-  final String _baseUrl = 'http://127.0.0.1:5000';
+  final String _baseUrl = ''; // Use a relative path for production
 
   Future<void> registerUser(User firebaseUser) async {
     final url = Uri.parse('$_baseUrl/users');

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class TournamentService {
-  final String _baseUrl = 'http://127.0.0.1:5000';
+  final String _baseUrl = ''; // Use a relative path for production
 
   Future<List<Map<String, dynamic>>> fetchAvailableTournaments() async {
     try {

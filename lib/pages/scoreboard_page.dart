@@ -59,8 +59,8 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
           children: [
             Image.asset(
               'lib/assets/images/logo.png', // Path to your logo file
-              height: 30, // Adjust height as needed
-              width: 30,  // Adjust width as needed
+              height: 40, // Adjust height as needed
+              width: 40,  // Adjust width as needed
             ),
             const SizedBox(width: 8), // Add some space between logo and title
             const Text('The Breakdown'),
