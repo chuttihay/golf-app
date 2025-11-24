@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1058415112061",
+    "project_id": "thay-golf-app55-402fc",
+    "storage_bucket": "thay-golf-app55-402fc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1058415112061:android:70d91de5a34e443e1f2614",
+        "android_client_info": {
+          "package_name": "com.example.golf_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBn2RnDN0A1QXvH0b-RJD9ZOo2--AJmd_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

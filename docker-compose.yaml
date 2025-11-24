@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: golf-app-backend
+    restart: unless-stopped
+    volumes: # Corrected typo here
+      - ./backend/golf_app.db:/app/backend/golf_app.db
+    ports: # Added missing ports mapping
+      - "5000:5000"
+    env_file: # Correctly placed env_file
+      - ./backend/.env
+
+  nginx:
+    image: nginx:latest
+    container_name: golf-app-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro # Corrected to :ro
+      - ./build/web:/usr/share/nginx/html:ro # Corrected to :ro
+    depends_on:
+      - backend  
