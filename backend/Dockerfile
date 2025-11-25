@@ -6,8 +6,12 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-COPY docker-entrypoint.sh . # Copy the entrypoint script
+# Explicitly copy only the necessary application files
+COPY app.py .
+COPY init_db.py .
+COPY docker-entrypoint.sh .
+COPY genesis_invitational_2025_earnings.txt .
+COPY schedule_2026.txt .
 
 EXPOSE 5000
 

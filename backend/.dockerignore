@@ -1,0 +1,20 @@
+# Ignore Python virtual environment
+venv/
+__pycache__/
+*.pyc
+
+# Ignore editor/temp files
+*.swp
+*.tmp
+*.log
+
+# Ignore template or other scripts you don't need in container
+*.tmpl
+scripts.py
+build_scripts.py
+install_scripts.py
+*.cpython-310.pyc
+
+# Ignore files we don't want copied into the image
+golf_app.db
+.env
