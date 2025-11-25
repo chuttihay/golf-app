@@ -92,7 +92,7 @@ def get_golfers():
     return jsonify([{"id": g.id, "name": g.name} for g in golfers])
 
 # --- Tournament Endpoints ---
-@app.route('/tournaments', methods=['POST'])
+@app.route('/api/tournaments', methods=['POST'])
 def add_tournament():
     data = request.get_json()
     required_fields = ['id', 'name', 'year', 'submission_start', 'submission_end']
@@ -120,7 +120,7 @@ def add_tournament():
     db.session.commit()
     return jsonify({"message": "Tournament added successfully"}), 201
 
-@app.route('/tournaments', methods=['GET'])
+@app.route('/api/tournaments', methods=['GET'])
 def get_tournaments():
     tournaments = Tournament.query.all()
     return jsonify([{"id": t.id, "name": t.name, "year": t.year} for t in tournaments])
@@ -141,7 +141,7 @@ def get_available_tournaments():
         "submission_end": t.submission_end.isoformat()
     } for t in available_tournaments])
 
-@app.route('/load-tournaments', methods=['POST'])
+@app.route('/api/load-tournaments', methods=['POST'])
 def load_tournaments_from_file():
     try:
         with open(os.path.join(basedir, 'schedule_2026.txt'), 'r') as f:
@@ -280,7 +280,7 @@ def update_earnings_for_tournament(tournament_id):
         print(f"An unexpected error occurred: {e}")
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 
-@app.route('/load-earnings', methods=['POST'])
+@app.route('/api/load-earnings', methods=['POST'])
 def load_earnings_from_file():
     try:
         with open(os.path.join(basedir, 'genesis_invitational_2025_earnings.txt'), 'r') as f:
