@@ -7,12 +7,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-
-# Run the database initialization script during the build
-RUN python init_db.py
+COPY docker-entrypoint.sh . # Copy the entrypoint script
 
 EXPOSE 5000
 
 ENV FLASK_APP=app.py
 
+# Use the entrypoint script to run init_db.py and then start Gunicorn
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
