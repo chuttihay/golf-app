@@ -5,8 +5,8 @@ services:
     build: ./backend
     container_name: golf-app-backend
     restart: unless-stopped
-    volumes: # Corrected typo here
-      - ./backend/golf_app.db:/app/backend/golf_app.db
+    volumes:
+      - ./backend:/app/backend
     ports: # Added missing ports mapping
       - "5000:5000"
     env_file: # Correctly placed env_file

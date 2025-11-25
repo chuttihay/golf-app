@@ -6,7 +6,7 @@ class UserService {
   final String _baseUrl = ''; // Use a relative path for production
 
   Future<void> registerUser(User firebaseUser) async {
-    final url = Uri.parse('$_baseUrl/users');
+    final url = Uri.parse('$_baseUrl/api/users');
     try {
       final response = await http.post(
         url,
