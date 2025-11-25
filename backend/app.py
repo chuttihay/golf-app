@@ -55,7 +55,7 @@ def hello_world():
     return 'Hello, World from Flask Backend!'
 
 # --- User Endpoints ---
-@app.route('/users', methods=['POST'])
+@app.route('/api/users', methods=['POST'])
 def add_user():
     data = request.get_json()
     if not data or not 'id' in data or not 'displayName' in data or not 'email' in data:
