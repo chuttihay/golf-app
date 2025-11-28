@@ -58,12 +58,29 @@ def hello_world():
 @app.route('/api/users', methods=['POST'])
 def add_user():
     data = request.get_json()
-    if not data or not 'id' in data or not 'displayName' in data or not 'email' in data:
+    if not data or not data.get('id') or not data.get('displayName') or not data.get('email'):
         return jsonify({"error": "Missing user ID, display name, or email"}), 400
     
+    # Check for uniqueness of display name (case-insensitive)
+    existing_user_by_name = User.query.filter(User.displayName.ilike(data['displayName'])).first()
+    if existing_user_by_name:
+        return jsonify({"error": "Display name is already taken"}), 409 # 409 Conflict
+
+    # Check for uniqueness of email (case-insensitive)
+    existing_user_by_email = User.query.filter(User.email.ilike(data['email'])).first()
+    if existing_user_by_email:
+        return jsonify({"error": "This email is already registered"}), 409 # 409 Conflict
+
+    # Check if user already exists by ID (Firebase UID)
     user = User.query.get(data['id'])
     if user:
-        return jsonify({"message": "User already exists"}), 200 # User already registered
+        # If user exists, but perhaps display name or email changed in Firebase, update them
+        if user.displayName != data['displayName']:
+            user.displayName = data['displayName']
+        if user.email != data['email']:
+            user.email = data['email']
+        db.session.commit()
+        return jsonify({"message": "User already exists and updated", "user": {"id": user.id, "displayName": user.displayName, "email": user.email}}), 200 # User already registered
     
     new_user = User(id=data['id'], displayName=data['displayName'], email=data['email'])
     db.session.add(new_user)
