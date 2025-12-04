@@ -19,6 +19,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+# --- Association Table for Tournament Golfers ---
+tournament_golfers = db.Table('tournament_golfers',
+    db.Column('tournament_id', db.String, db.ForeignKey('tournament.id'), primary_key=True),
+    db.Column('golfer_id', db.String, db.ForeignKey('golfer.id'), primary_key=True)
+)
+
 # --- Database Models ---
 class User(db.Model):
     id = db.Column(db.String, primary_key=True) # Firebase UID
@@ -29,6 +35,7 @@ class User(db.Model):
 class Golfer(db.Model):
     id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String, nullable=False)
+    # The 'tournaments' backref is created automatically by the relationship in the Tournament model
 
 class Tournament(db.Model):
     id = db.Column(db.String, primary_key=True)
@@ -36,6 +43,10 @@ class Tournament(db.Model):
     year = db.Column(db.Integer, nullable=False)
     submission_start = db.Column(db.DateTime, nullable=False)
     submission_end = db.Column(db.DateTime, nullable=False)
+    golfers_last_updated = db.Column(db.DateTime, nullable=True) # For caching
+    
+    golfers = db.relationship('Golfer', secondary=tournament_golfers, lazy='subquery',
+        backref=db.backref('tournaments', lazy=True))
 
 class Pick(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -342,20 +353,28 @@ def load_earnings_from_file():
 
 @app.route('/api/tournaments/<string:tournament_id>/golfers', methods=['GET'])
 def get_golfers_for_tournament(tournament_id):
-    print(f"--- Attempting to get golfers for tournament ID: {tournament_id} ---")
+    # --- Caching Logic ---
+    tournament = Tournament.query.get(tournament_id)
+    if not tournament:
+        return jsonify({"error": "Tournament not found in local database"}), 404
+
+    # Check if the golfer list was updated in the last 24 hours
+    if tournament.golfers_last_updated and (datetime.now(timezone.utc) - tournament.golfers_last_updated) < timedelta(days=1):
+        print(f"--- Cache HIT for tournament ID: {tournament_id} ---")
+        golfers_data = [{"id": g.id, "name": g.name} for g in tournament.golfers]
+        return jsonify(golfers_data)
+
+    print(f"--- Cache MISS for tournament ID: {tournament_id} ---")
+    
+    # --- API Fetching Logic (if cache miss) ---
     rapidapi_key = os.getenv('RAPIDAPI_KEY')
     rapidapi_host = os.getenv('RAPIDAPI_HOST')
 
     if not rapidapi_key or not rapidapi_host:
         return jsonify({"error": "RapidAPI key or host not configured in environment variables"}), 500
 
-    # Retrieve year from the Tournament model
-    tournament = Tournament.query.get(tournament_id)
-    if not tournament:
-        return jsonify({"error": "Tournament not found in local database"}), 404
-    
-    year = str(tournament.year) # Convert year to string for API parameter
-    org_id = "1" # Assuming PGA Tour for now, can be made dynamic later
+    year = str(tournament.year)
+    org_id = "1"
 
     url = f"https://{rapidapi_host}/tournament"
     headers = {
@@ -370,35 +389,44 @@ def get_golfers_for_tournament(tournament_id):
 
     try:
         response = requests.get(url, headers=headers, params=params)
-        response.raise_for_status() # Raise an exception for HTTP errors (4xx or 5xx)
+        response.raise_for_status()
         data = response.json()
 
         if 'players' not in data:
             return jsonify({"error": "No players found for this tournament from external API"}), 404
 
+        # Clear old golfer associations for this tournament
+        tournament.golfers.clear()
+        
         golfers_data = []
         for player in data['players']:
             golfer_id = player['playerId']
-            first_name = player.get('firstName', '')
-            last_name = player.get('lastName', '')
-            full_name = f"{first_name} {last_name}".strip()
+            full_name = f"{player.get('firstName', '')} {player.get('lastName', '')}".strip()
 
-            # Add golfer to our database if they don't exist
+            # 'Upsert' the golfer (add if not exists)
             existing_golfer = Golfer.query.get(golfer_id)
             if not existing_golfer:
                 new_golfer = Golfer(id=golfer_id, name=full_name)
                 db.session.add(new_golfer)
-            
+                tournament.golfers.append(new_golfer)
+            else:
+                tournament.golfers.append(existing_golfer)
+
             golfers_data.append({"id": golfer_id, "name": full_name})
         
-        db.session.commit() # Commit any new golfers added to our DB
-
+        # Update the cache timestamp
+        tournament.golfers_last_updated = datetime.now(timezone.utc)
+        
+        db.session.commit()
+        
         return jsonify(golfers_data)
 
     except requests.exceptions.RequestException as e:
+        db.session.rollback()
         print(f"Error fetching golfers from external API: {e}")
         return jsonify({"error": f"Failed to fetch golfers from external API: {str(e)}"}), 500
     except Exception as e:
+        db.session.rollback()
         print(f"An unexpected error occurred: {e}")
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 
