@@ -361,7 +361,10 @@ def get_golfers_for_tournament(tournament_id):
     # Check if the golfer list was updated in the last 24 hours
     if tournament.golfers_last_updated and (datetime.now(timezone.utc) - tournament.golfers_last_updated) < timedelta(days=1):
         print(f"--- Cache HIT for tournament ID: {tournament_id} ---")
-        golfers_data = [{"id": g.id, "name": g.name} for g in tournament.golfers]
+        # Explicitly query for the golfers associated with this tournament
+        # This is more robust than relying on the backref alone.
+        golfers = Golfer.query.join(tournament_golfers).join(Tournament).filter(Tournament.id == tournament_id).all()
+        golfers_data = [{"id": g.id, "name": g.name} for g in golfers]
         return jsonify(golfers_data)
 
     print(f"--- Cache MISS for tournament ID: {tournament_id} ---")
