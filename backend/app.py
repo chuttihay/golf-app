@@ -443,8 +443,8 @@ def submit_picks():
     tournament_id = data['tournament_id']
     golfer_ids = data['golfer_ids']
 
-    if not isinstance(golfer_ids, list) or len(golfer_ids) != 3:
-        return jsonify({"error": "Exactly 3 golfer_ids must be provided as a list"}), 400
+    if not isinstance(golfer_ids, list) or len(golfer_ids) != 2:
+        return jsonify({"error": "Exactly 2 golfer_ids must be provided as a list"}), 400
 
     # 1. Check if the submission window is still open
     tournament = Tournament.query.get(tournament_id)
