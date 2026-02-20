@@ -103,12 +103,12 @@ class _PickSubmissionPageState extends State<PickSubmissionPage> {
                                 onChanged: (bool? value) {
                                   setState(() {
                                     if (value == true) {
-                                      if (_selectedGolferIds.length < 3) {
+                                      if (_selectedGolferIds.length < 2) {
                                         _selectedGolferIds.add(golfer['id']);
                                       } else {
-                                        // Optional: Show a message that they can't select more than 3
+                                        // Optional: Show a message that they can't select more than 2
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('You can only select 3 golfers.')),
+                                          const SnackBar(content: Text('You can only select 2 golfers.')),
                                         );
                                       }
                                     } else {
@@ -124,7 +124,7 @@ class _PickSubmissionPageState extends State<PickSubmissionPage> {
                           padding: const EdgeInsets.all(16.0),
                           child: ElevatedButton(
                             // Disable button if not exactly 3 golfers are selected
-                            onPressed: _selectedGolferIds.length == 3
+                            onPressed: _selectedGolferIds.length == 2
                                 ? () async {
                                     final user = _auth.currentUser;
                                     if (user == null) {
@@ -156,7 +156,7 @@ class _PickSubmissionPageState extends State<PickSubmissionPage> {
                                     }
                                   }
                                 : null, // This disables the button
-                            child: const Text('Submit 3 Picks'),
+                            child: const Text('Submit 2 Picks'),
                           ),
                         ),
                       ],
