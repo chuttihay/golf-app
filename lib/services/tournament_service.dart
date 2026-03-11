@@ -1,8 +1,12 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class TournamentService {
-  final String _baseUrl = ''; // Use a relative path for production
+  final String _baseUrl = const String.fromEnvironment(
+    'BACKEND_URL',
+    defaultValue: kIsWeb ? '' : 'http://10.0.2.2:5000',
+  );
 
   Future<List<Map<String, dynamic>>> fetchAvailableTournaments() async {
     try {

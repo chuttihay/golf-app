@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -99,7 +100,16 @@ class OverallScore {
 // --- SERVICE CLASS ---
 
 class ScoreboardService {
-  final String _baseUrl = ''; // Use a relative path for production
+  // The backend URL is now configurable.
+  // For web, this should be an empty string to use a relative path.
+  // For mobile, it needs to be the address of the backend.
+  // e.g. http://10.0.2.2:5000 for Android emulator
+  // e.g. http://<your-machine-ip>:5000 for a real device
+  final String _baseUrl = const String.fromEnvironment(
+    'BACKEND_URL',
+    defaultValue: kIsWeb ? '' : 'http://10.0.2.2:5000',
+  );
+
 
   // --- NEW METHOD for Detailed Scoreboard ---
   Future<DetailedScoreboard> fetchDetailedScoreboard() async {

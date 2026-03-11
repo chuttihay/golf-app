@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserService {
-  final String _baseUrl = ''; // Use a relative path for production
+  final String _baseUrl = const String.fromEnvironment(
+    'BACKEND_URL',
+    defaultValue: kIsWeb ? '' : 'http://10.0.2.2:5000',
+  );
 
   Future<void> registerUser(User firebaseUser) async {
     final url = Uri.parse('$_baseUrl/api/users');
