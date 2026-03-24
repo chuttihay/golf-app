@@ -68,14 +68,14 @@ class UserTournamentScore {
 
 class PickDetails {
   final String golferName;
-  final int earnings;
+  final int? earnings; // Made nullable
 
-  PickDetails({required this.golferName, required this.earnings});
+  PickDetails({required this.golferName, this.earnings});
 
   factory PickDetails.fromJson(Map<String, dynamic> json) {
     return PickDetails(
       golferName: json['golfer_name'],
-      earnings: json['earnings'],
+      earnings: json['earnings'], // Will be null if JSON is null
     );
   }
 }

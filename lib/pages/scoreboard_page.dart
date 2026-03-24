@@ -182,11 +182,11 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
                 return ListTile(
                   title: Text(pick.golferName),
                   trailing: Text(
-                    pick.earnings > 0 
+                    pick.earnings != null 
                       ? currencyFormatter.format(pick.earnings) 
                       : 'Pending',
                     style: TextStyle(
-                      color: pick.earnings > 0 ? Colors.black87 : Colors.grey,
+                      color: pick.earnings != null ? Colors.black87 : Colors.grey,
                     ),
                   ),
                 );

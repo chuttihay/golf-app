@@ -565,7 +565,7 @@ def get_detailed_scoreboard():
                 user_id = pick_entry.id
                 display_name = pick_entry.displayName
                 golfer_name = pick_entry.golfer_name
-                earnings = pick_entry.earnings if pick_entry.earnings is not None else 0 # Default to 0 if no earnings yet
+                earnings = pick_entry.earnings # Keep as None if no result exists
 
                 # Aggregate results by user for this specific tournament
                 if user_id not in user_scores_for_tournament:
@@ -580,10 +580,12 @@ def get_detailed_scoreboard():
                     "golfer_name": golfer_name,
                     "earnings": earnings
                 })
-                user_scores_for_tournament[user_id]['total_earnings'] += earnings
+                # Only add to total if earnings is not None
+                if earnings is not None:
+                    user_scores_for_tournament[user_id]['total_earnings'] += earnings
 
                 # Update overall score (only if earnings are available for this pick)
-                if earnings > 0: # Only add to overall score if there are actual earnings
+                if earnings is not None and earnings > 0: # Only add to overall score if there are actual earnings
                     if user_id not in overall_scores:
                         overall_scores[user_id] = {
                             "user_id": user_id,
